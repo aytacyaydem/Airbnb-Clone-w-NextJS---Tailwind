@@ -27,7 +27,7 @@ export default function Home({exploreData}) {
         <Widget>
           <Widget.Title>Live Anywhere</Widget.Title>
           <Widget.Content>
-            <p>Deneme 2</p>
+            <p>Deneme 23</p>
           </Widget.Content>
         </Widget>
       </main>
