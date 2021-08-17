@@ -1,6 +1,6 @@
-function Widget({children}) {
+function Widget({children, ...restProps}) {
     return (
-        <section className="pt-5">  
+        <section className="pt-5" {...restProps}>  
             {children}
         </section>
     )
@@ -12,9 +12,9 @@ function Title({children}){
     )
 }
 
-function Content({children}) {
+function Content({children, ...restProps}) {
     return (
-        <div>
+        <div {...restProps}>
             {children}
         </div>
     )
