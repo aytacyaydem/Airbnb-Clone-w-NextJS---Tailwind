@@ -1,5 +1,7 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
+import { useRouter } from "next/router";
+
 import {
   SearchIcon,
   GlobeAltIcon,
@@ -10,18 +12,26 @@ import {
 
 //Packages
 import { DateRangePicker } from "react-date-range";
+import {format} from "date-fns"
 
 function Header() {
   let numberOfGuestRef = React.createRef();
+  const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [numberOfGuests, setNumberOfGuests] = useState(1);
+  const [placeholderText, handlePlaceholderText] = useState("Start your search");
   const selectionRange = {
     startDate: startDate,
     endDate: endDate,
     key: "selection",
   };
+
+  const formattedStartDate = format(new Date(startDate), "dd MMMM yyyy")
+  const formattedEndDate = format(new Date(endDate), "dd MMMM yyyy")
+  const range = `${formattedStartDate} - ${formattedEndDate}`
+
   function handleSearch(event) {
     setSearchText(event.target.value);
   }
@@ -34,9 +44,40 @@ function Header() {
     console.log(event.target.value);
     setNumberOfGuests(event.target.value);
   }
-  function handleCancelSearch(){
+  function handleCancelSearch() {
     setSearchText("");
   }
+  function handlePlaceholder() {
+    if (router.query && router.query?.location) {
+      handlePlaceholderText(`${router.query.location} | ${range} | ${numberOfGuests} guests`);
+    }else {
+      handlePlaceholderText('Start your search')
+    }
+  }
+
+  function handleSubmitSearch(event) {
+    // event.preventDefault();
+    handleCancelSearch();
+    router.push({
+      pathname: "/search",
+      query: {
+        location: searchText,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        numberOfGuests,
+      },
+    });
+  }
+
+  function handleInputKeyPress(event) {
+    event.keyCode == 13 && handleSubmitSearch();
+    event.keyCode === 27 && handleCancelSearch();
+  }
+
+  useLayoutEffect(() => {
+    handlePlaceholder();
+  }, [router.query]);
+
   return (
     <header className="sticky top-0 z-50 grid grid-cols-3 items-center bg-white shadow-md p-5 md:px-10">
       {/* Left Side - Logo*/}
@@ -55,9 +96,10 @@ function Header() {
         <input
           type="text"
           className=" flex-grow py-2 bg-transparent self-stretch outline-none pl-5 text-sm text-gray-600 placeholder-gray-400"
-          placeholder="Start your search"
+          placeholder={placeholderText}
           onChange={handleSearch}
           value={searchText}
+          onKeyDown={handleInputKeyPress}
         />
         <SearchIcon className="absolute hidden md:inline h-8 bg-red-400 text-white rounded-full p-2 cursor-pointer right-0 md:mx-2" />
       </div>
@@ -99,8 +141,18 @@ function Header() {
             />
           </div>
           <div className="flex">
-            <button onClick={handleCancelSearch} className="flex-1 text-gray-500">Cancel</button>
-            <button className="flex-1 text-red-400">Search</button>
+            <button
+              onClick={handleCancelSearch}
+              className="flex-1 text-gray-500"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmitSearch}
+              className="flex-1 text-red-400"
+            >
+              Search
+            </button>
           </div>
         </div>
       )}

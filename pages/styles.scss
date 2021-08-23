@@ -1,4 +1,12 @@
+@tailwind components;
+
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button {  
    opacity: 1;
+}
+
+@layer components {
+   .filter-button {
+      @apply px-4 py-2 border rounded-full cursor-pointer hover:shadow-lg active:scale-95 transition transform duration-100 ease-out active:bg-gray-100;
+   }
 }
